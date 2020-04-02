@@ -1,4 +1,6 @@
-	#!/usr/bin/env python
+#!/usr/bin/env python
+
+while True:
 	
 	ip = raw_input("Type ip address, please:(10.1.1.1) " )
 	#ip = "192.168.1.1"
@@ -26,7 +28,9 @@
 			print("unassigned")
 		else:
 			print("unused")
+		break
 	else:
 		print("Bad ip")
+		continue
 	 
 	
