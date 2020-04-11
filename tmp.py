@@ -24,7 +24,17 @@ london_co = {
         'routing': True
     }
 }
-device = raw_input("Enter device:[r1, r2 or sw1] ")
-print( "\n" + "-"*30 )
-print(london_co[device])
+#device = raw_input("Enter device:[r1, r2 or sw1] ")
+#print( "\n" + "-"*30 )
+#print(london_co[device])
+
+#if "fast" in "fastEthernet":
+#	print("TRUE")
+
+#print(type(london_co["r1"].items()))
+
+for name in london_co["r1"].items():
+	print(name)
+ 
+ 
 
