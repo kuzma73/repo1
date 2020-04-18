@@ -33,8 +33,13 @@ london_co = {
 
 #print(type(london_co["r1"].items()))
 
-for name in london_co["r1"].items():
-	print(name)
+#for name in london_co["r1"].items():
+#	print(name)
+def test_f(par1, pass1, name):
+	print("name - {}\npass - {}\npar1 - {}".format(name, pass1, par1))
+
+test_f("zxc", name="my_name", pass1="123") 
+
  
  
 
