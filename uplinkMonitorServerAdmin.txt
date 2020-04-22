@@ -1,0 +1,75 @@
+:local tmp [:toarray ""]
+:local numInt 
+:local truFal [:toarray ""]
+:local l 0
+:local tf
+:local file
+:local lastPos 0
+:local k true
+:local line
+:local count 1
+
+:delay 30s;
+
+/log info ("uplinkMonitor working!")
+
+for i from=0 to=50 do={ :set ($truFal->$i) 1;}
+
+while (true) do={
+
+    :set tmp [/interface ethernet find where name~".*uplink"]
+
+    :if ( [:len $tmp]>1) do={ /log info ("More then one uplink!"); :delay 10s; /log info ("Trying!"); :set count 0 } else={
+        :if ( [:len $tmp]<1) do={ /log info ("No uplinks founded!"); :delay 10s; /log info ("Trying!"); :set count 0 } else={
+                   
+            :if ($count=0) do={:set count 1; /log info ("uplinkMonitor working!"); :for i from=0 to=50 do={ :set ($truFal->$i) 1;} }
+              
+            :set l [:len ($tmp->0)]
+            :set $numInt [:pick ($tmp->0) 1 $l];
+                  
+            :set tf [/interface get ($numInt-1) running];
+             			
+            :if (  $truFal->(($numInt*1)-1)=1  ) do={ 
+               :set ($truFal->(($numInt*1)-1)) $tf;
+            }
+             			 
+            :if (  $truFal->(($numInt*1)-1)=true  && $tf=false ) do={
+                :set ($truFal->(($numInt*1)-1) ) false;
+                   
+                /system logging action  add name="uplinkCrashDisk" target="disk" disk-file-name="uplinkCrash"
+                /system logging add topics="critical" action="uplinkCrashDisk"	
+                /system logging add topics="error" action="uplinkCrashDisk"	
+                /system logging add topics="warning" action="uplinkCrashDisk"	
+                /system logging add topics="info" action="uplinkCrashDisk"	
+                /log info ("ether" . ($numInt)  . " uplink link down (BY SCRIPT)");                  
+                   
+            }
+               
+            :if (  $truFal->(($numInt*1)-1)=false  && $tf=true ) do={ 
+                :set ($truFal->(($numInt*1)-1)) true;
+                /log info ("ether" . ($numInt)  . " uplink link up (BY SCRIPT)")
+	/system logging remove [/system logging find where  action="uplinkCrashDisk"]
+	/system logging action remove [/system logging action find where name="uplinkCrashDisk"]
+                                    				
+                :delay 1s
+                      
+                :set file [/file get [/file find where name="uplinkCrash.0.txt"] contents ]
+                /log error ("start-------------SCRIPT-------------------start")
+                        
+                :set k true; set lastPos 0;
+                :while (k) do={
+                    :set line [:pick $file $lastPos [:find $file "\n" $lastPos]];
+                    /log info $line
+                    :set $lastPos  ([:find $file "\n" $lastPos ]+1)
+                    :if ( $lastPos>=[:len $file] ) do={ :set k false }
+                }
+                                  
+                /log error ("end---------------SCRIPT---------------end" )
+                   
+                /file remove [/file find where name="uplinkCrash.0.txt"]
+                    
+             }
+            :delay 300ms;
+        }        
+    }
+}
